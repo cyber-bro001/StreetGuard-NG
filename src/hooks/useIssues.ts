@@ -51,10 +51,10 @@ export function useCreateIssue() {
         .single();
       if (error) throw error;
 
-      // Award points
+      // Award points and increment reports count
       const points = issue.image_url ? 15 : 10;
       await supabase.rpc('add_points', { user_id: user.id, amount: points });
-
+      await supabase.rpc('increment_reports_count', { p_user_id: user.id });
       return data;
     },
     onSuccess: () => {
