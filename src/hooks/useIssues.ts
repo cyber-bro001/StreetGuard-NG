@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Issue {
   id: string;
@@ -21,10 +21,10 @@ export function useIssues() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('issues')
-        .select('*, profiles(name)')
+        .select('*, profiles!issues_created_by_profiles_fkey(name)')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data as Issue[];
+      return (data as unknown) as Issue[];
     },
     staleTime: 30_000,
   });

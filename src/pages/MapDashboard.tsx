@@ -8,7 +8,7 @@ import { CheckCircle, AlertTriangle, Calendar, User } from 'lucide-react';
 import { toast } from 'sonner';
 import ReportDialog from '@/components/ReportDialog';
 
-const LAGOS_CENTER: [number, number] = [6.5244, 3.3792];
+const DELTA_STATE_CENTER: [number, number] = [5.8904, 5.6804];
 
 const severityColors = {
   severe: '#ef4444',
@@ -118,7 +118,7 @@ export default function MapDashboard() {
       )}
 
       <MapContainer
-        center={LAGOS_CENTER}
+        center={DELTA_STATE_CENTER}
         zoom={12}
         className="h-full w-full"
         zoomControl={false}
