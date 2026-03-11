@@ -8,7 +8,7 @@ import { CheckCircle, AlertTriangle, Calendar, User } from 'lucide-react';
 import { toast } from 'sonner';
 import ReportDialog from '@/components/ReportDialog';
 
-const DELTA_STATE_CENTER: [number, number] = [5.8904, 5.6804];
+const DELTA_STATE_CENTER: [number, number] = [6.1956, 6.7314];
 
 const severityColors = {
   severe: '#ef4444',
