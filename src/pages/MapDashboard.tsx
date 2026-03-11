@@ -118,7 +118,7 @@ export default function MapDashboard() {
       )}
 
       <MapContainer
-        center={LAGOS_CENTER}
+        center={DELTA_STATE_CENTER}
         zoom={12}
         className="h-full w-full"
         zoomControl={false}

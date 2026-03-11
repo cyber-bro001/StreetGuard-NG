@@ -38,9 +38,9 @@ export default function ReportDialog() {
       },
       () => {
         // Fallback to Lagos center
-        setLocation({ lat: 6.5244, lng: 3.3792 });
+        setLocation({ lat: 5.8904, lng: 5.6804 });
         setLocating(false);
-        toast.info('Using default location (Lagos)');
+        toast.info('Using default location (Delta State)');
       },
       { timeout: 5000 }
     );

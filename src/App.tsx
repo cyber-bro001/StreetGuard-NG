@@ -5,13 +5,19 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const MapDashboard = lazy(() => import("./pages/MapDashboard"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 1, refetchOnWindowFocus: false },
+    mutations: { retry: 0 },
+  },
+});
 
 const Loading = () => (
   <div className="flex min-h-screen items-center justify-center bg-background">
@@ -20,24 +26,26 @@ const Loading = () => (
 );
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <BrowserRouter>
-          <Navbar />
-          <Suspense fallback={<Loading />}>
-            <Routes>
-              <Route path="/" element={<MapDashboard />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <BrowserRouter>
+            <Navbar />
+            <Suspense fallback={<Loading />}>
+              <Routes>
+                <Route path="/" element={<MapDashboard />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
