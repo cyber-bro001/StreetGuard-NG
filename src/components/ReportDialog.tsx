@@ -83,7 +83,7 @@ export default function ReportDialog() {
           <Plus className="h-6 w-6" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[420px] rounded-2xl border-border/50 bg-card/95 backdrop-blur-xl">
+      <DialogContent className="sm:max-w-[420px] rounded-2xl border-border/50 bg-card/95 backdrop-blur-xl overflow-visible">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-base">
             <AlertTriangle className="h-4 w-4 text-primary" />
