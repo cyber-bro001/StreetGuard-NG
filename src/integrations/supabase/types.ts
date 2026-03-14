@@ -24,6 +24,7 @@ export type Database = {
           latitude: number
           longitude: number
           severity: string
+          status: string
           type: string
           verified_count: number
         }
@@ -36,6 +37,7 @@ export type Database = {
           latitude: number
           longitude: number
           severity?: string
+          status?: string
           type: string
           verified_count?: number
         }
@@ -48,6 +50,7 @@ export type Database = {
           latitude?: number
           longitude?: number
           severity?: string
+          status?: string
           type?: string
           verified_count?: number
         }
