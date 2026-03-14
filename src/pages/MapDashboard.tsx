@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useMemo, useState, useCallback } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { useIssues, useVerifyIssue, type Issue } from '@/hooks/useIssues';
 import { useAuthContext } from '@/components/AuthProvider';
@@ -25,6 +25,13 @@ function createIcon(severity: string) {
     iconAnchor: [12, 12],
   });
 }
+
+const draggableIcon = L.divIcon({
+  className: '',
+  html: `<div style="width:28px;height:28px;background:#3b82f6;border:3px solid #fff;border-radius:50%;box-shadow:0 0 12px rgba(59,130,246,0.6);animation:pulse 1.5s infinite;"></div>`,
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
+});
 
 function InfraScore({ issues }: { issues: Issue[] }) {
   const score = Math.max(0, Math.min(10, 10 - (issues.length / 5)));
@@ -118,8 +125,41 @@ function IssuePopup({ issue }: { issue: Issue }) {
   );
 }
 
+// Component to handle draggable marker events
+function DraggableMarker({
+  position,
+  onDragEnd,
+}: {
+  position: [number, number];
+  onDragEnd: (lat: number, lng: number) => void;
+}) {
+  return (
+    <Marker
+      position={position}
+      icon={draggableIcon}
+      draggable
+      eventHandlers={{
+        dragend: (e) => {
+          const marker = e.target;
+          const pos = marker.getLatLng();
+          onDragEnd(pos.lat, pos.lng);
+        },
+      }}
+    />
+  );
+}
+
 export default function MapDashboard() {
   const { data: issues = [], isLoading } = useIssues();
+  const [reportLocation, setReportLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  const handleLocationChange = useCallback((loc: { lat: number; lng: number } | null) => {
+    setReportLocation(loc);
+  }, []);
+
+  const handleDragEnd = useCallback((lat: number, lng: number) => {
+    setReportLocation({ lat, lng });
+  }, []);
 
   const markers = useMemo(
     () => issues.map((issue) => ({
@@ -133,7 +173,10 @@ export default function MapDashboard() {
   return (
     <div className="relative h-screen pt-14">
       <InfraScore issues={issues} />
-      <ReportDialog />
+      <ReportDialog
+        onLocationChange={handleLocationChange}
+        externalLocation={reportLocation}
+      />
       <MapLegend />
 
       {isLoading && (
@@ -159,6 +202,12 @@ export default function MapDashboard() {
             </Popup>
           </Marker>
         ))}
+        {reportLocation && (
+          <DraggableMarker
+            position={[reportLocation.lat, reportLocation.lng]}
+            onDragEnd={handleDragEnd}
+          />
+        )}
       </MapContainer>
     </div>
   );
