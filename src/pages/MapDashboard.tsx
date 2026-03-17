@@ -223,6 +223,7 @@ export default function MapDashboard() {
   return (
     <div className="relative h-screen pt-14">
       <InfraScore issues={issues} />
+      <NearbyIssuesAlert issues={issues} onFocusNearby={handleFocusNearby} />
       <ReportDialog
         onLocationChange={handleLocationChange}
         externalLocation={reportLocation}
