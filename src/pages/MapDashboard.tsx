@@ -176,6 +176,11 @@ function DraggableMarker({
 export default function MapDashboard() {
   const { data: issues = [], isLoading } = useIssues();
   const [reportLocation, setReportLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [flyTarget, setFlyTarget] = useState<{ lat: number; lng: number } | null>(null);
+
+  const handleFocusNearby = useCallback((lat: number, lng: number) => {
+    setFlyTarget({ lat, lng });
+  }, []);
 
   const handleLocationChange = useCallback((loc: { lat: number; lng: number } | null) => {
     setReportLocation(loc);
