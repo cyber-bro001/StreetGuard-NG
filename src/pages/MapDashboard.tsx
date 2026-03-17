@@ -1,5 +1,5 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useIssues, useVerifyIssue, type Issue } from '@/hooks/useIssues';
 import { useAuthContext } from '@/components/AuthProvider';
@@ -7,6 +7,15 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, AlertTriangle, Calendar, User, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import ReportDialog from '@/components/ReportDialog';
+import NearbyIssuesAlert from '@/components/NearbyIssuesAlert';
+
+function MapFlyTo({ target }: { target: { lat: number; lng: number } | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (target) map.flyTo([target.lat, target.lng], 15, { duration: 1 });
+  }, [target, map]);
+  return null;
+}
 
 const DELTA_STATE_CENTER: [number, number] = [6.1956, 6.7314];
 
