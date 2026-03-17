@@ -259,6 +259,7 @@ export default function MapDashboard() {
             onDragEnd={handleDragEnd}
           />
         )}
+        <MapFlyTo target={flyTarget} />
       </MapContainer>
     </div>
   );
