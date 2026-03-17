@@ -1,5 +1,5 @@
-import { useMemo, useState, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { useMemo, useState, useCallback, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { useIssues, useVerifyIssue, type Issue } from '@/hooks/useIssues';
 import { useAuthContext } from '@/components/AuthProvider';
@@ -32,6 +32,22 @@ const draggableIcon = L.divIcon({
   iconSize: [28, 28],
   iconAnchor: [14, 14],
 });
+
+function getPositionKey(issue: Pick<Issue, 'latitude' | 'longitude'>) {
+  return `${issue.latitude.toFixed(6)}:${issue.longitude.toFixed(6)}`;
+}
+
+function offsetDuplicateMarker(issue: Issue, duplicateIndex: number, duplicateCount: number): [number, number] {
+  if (duplicateCount <= 1) {
+    return [issue.latitude, issue.longitude];
+  }
+
+  const angle = (duplicateIndex / duplicateCount) * Math.PI * 2;
+  const latOffset = 0.00012 * Math.sin(angle);
+  const lngOffset = (0.00012 * Math.cos(angle)) / Math.max(Math.cos((issue.latitude * Math.PI) / 180), 0.3);
+
+  return [issue.latitude + latOffset, issue.longitude + lngOffset];
+}
 
 function InfraScore({ issues }: { issues: Issue[] }) {
   const score = Math.max(0, Math.min(10, 10 - (issues.length / 5)));
@@ -125,7 +141,6 @@ function IssuePopup({ issue }: { issue: Issue }) {
   );
 }
 
-// Component to handle draggable marker events
 function DraggableMarker({
   position,
   onDragEnd,
@@ -161,14 +176,35 @@ export default function MapDashboard() {
     setReportLocation({ lat, lng });
   }, []);
 
-  const markers = useMemo(
-    () => issues.map((issue) => ({
-      ...issue,
-      icon: createIcon(issue.severity),
-      position: [issue.latitude, issue.longitude] as [number, number],
-    })),
-    [issues]
-  );
+  const markers = useMemo(() => {
+    const duplicateCounts = new Map<string, number>();
+    const duplicateIndices = new Map<string, number>();
+
+    for (const issue of issues) {
+      const key = getPositionKey(issue);
+      duplicateCounts.set(key, (duplicateCounts.get(key) ?? 0) + 1);
+    }
+
+    return issues.map((issue) => {
+      const key = getPositionKey(issue);
+      const duplicateIndex = duplicateIndices.get(key) ?? 0;
+      duplicateIndices.set(key, duplicateIndex + 1);
+
+      return {
+        ...issue,
+        icon: createIcon(issue.severity),
+        position: offsetDuplicateMarker(issue, duplicateIndex, duplicateCounts.get(key) ?? 1),
+      };
+    });
+  }, [issues]);
+
+  useEffect(() => {
+    console.debug('[MapDashboard] rendering reports', {
+      fetchedReports: issues.length,
+      renderedMarkers: markers.length,
+      duplicateCoordinateGroups: new Set(issues.map(getPositionKey)).size,
+    });
+  }, [issues, markers]);
 
   return (
     <div className="relative h-screen pt-14">
@@ -195,10 +231,10 @@ export default function MapDashboard() {
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
-        {markers.map((m) => (
-          <Marker key={m.id} position={m.position} icon={m.icon}>
+        {markers.map((marker) => (
+          <Marker key={marker.id} position={marker.position} icon={marker.icon}>
             <Popup>
-              <IssuePopup issue={m} />
+              <IssuePopup issue={marker} />
             </Popup>
           </Marker>
         ))}
