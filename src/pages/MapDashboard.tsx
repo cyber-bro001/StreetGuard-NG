@@ -1,5 +1,5 @@
-import { useMemo, useState, useCallback, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useIssues, useVerifyIssue, type Issue } from '@/hooks/useIssues';
 import { useAuthContext } from '@/components/AuthProvider';
@@ -7,6 +7,15 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, AlertTriangle, Calendar, User, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import ReportDialog from '@/components/ReportDialog';
+import NearbyIssuesAlert from '@/components/NearbyIssuesAlert';
+
+function MapFlyTo({ target }: { target: { lat: number; lng: number } | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (target) map.flyTo([target.lat, target.lng], 15, { duration: 1 });
+  }, [target, map]);
+  return null;
+}
 
 const DELTA_STATE_CENTER: [number, number] = [6.1956, 6.7314];
 
@@ -167,6 +176,11 @@ function DraggableMarker({
 export default function MapDashboard() {
   const { data: issues = [], isLoading } = useIssues();
   const [reportLocation, setReportLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [flyTarget, setFlyTarget] = useState<{ lat: number; lng: number } | null>(null);
+
+  const handleFocusNearby = useCallback((lat: number, lng: number) => {
+    setFlyTarget({ lat, lng });
+  }, []);
 
   const handleLocationChange = useCallback((loc: { lat: number; lng: number } | null) => {
     setReportLocation(loc);
@@ -209,6 +223,7 @@ export default function MapDashboard() {
   return (
     <div className="relative h-screen pt-14">
       <InfraScore issues={issues} />
+      <NearbyIssuesAlert issues={issues} onFocusNearby={handleFocusNearby} />
       <ReportDialog
         onLocationChange={handleLocationChange}
         externalLocation={reportLocation}
@@ -244,6 +259,7 @@ export default function MapDashboard() {
             onDragEnd={handleDragEnd}
           />
         )}
+        <MapFlyTo target={flyTarget} />
       </MapContainer>
     </div>
   );
