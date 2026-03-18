@@ -50,6 +50,7 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [roadWarning, setRoadWarning] = useState<string | null>(null);
   const [checkingRoad, setCheckingRoad] = useState(false);
+  const [roadName, setRoadName] = useState<string | null>(null);
 
   useEffect(() => {
     if (externalLocation && open) {
