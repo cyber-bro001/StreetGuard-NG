@@ -125,6 +125,7 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
     setDescription('');
     setLocation(null);
     setRoadWarning(null);
+    setRoadName(null);
     onLocationChange?.(null);
   };
 
