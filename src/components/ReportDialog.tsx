@@ -261,9 +261,14 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
             )}
 
             {location && !roadWarning && !checkingRoad && (
-              <p className="text-[11px] text-muted-foreground">
-                📍 {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
-              </p>
+              <div className="space-y-0.5">
+                <p className="text-[11px] font-medium text-foreground">
+                  📍 {roadName || 'Unnamed Road'}
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                </p>
+              </div>
             )}
           </div>
 
