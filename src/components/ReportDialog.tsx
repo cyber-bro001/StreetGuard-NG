@@ -65,6 +65,7 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
     setRoadWarning(null);
     const result = await checkNearRoad(lat, lng);
     setCheckingRoad(false);
+    setRoadName(result.roadName || null);
     if (!result.nearRoad) {
       setRoadWarning('This location does not appear to be directly on a road. Continue anyway?');
     } else if (result.roadName) {
