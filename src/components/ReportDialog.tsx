@@ -50,6 +50,7 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [roadWarning, setRoadWarning] = useState<string | null>(null);
   const [checkingRoad, setCheckingRoad] = useState(false);
+  const [roadName, setRoadName] = useState<string | null>(null);
 
   useEffect(() => {
     if (externalLocation && open) {
@@ -64,6 +65,7 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
     setRoadWarning(null);
     const result = await checkNearRoad(lat, lng);
     setCheckingRoad(false);
+    setRoadName(result.roadName || null);
     if (!result.nearRoad) {
       setRoadWarning('This location does not appear to be directly on a road. Continue anyway?');
     } else if (result.roadName) {
@@ -123,6 +125,7 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
     setDescription('');
     setLocation(null);
     setRoadWarning(null);
+    setRoadName(null);
     onLocationChange?.(null);
   };
 
@@ -258,9 +261,14 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
             )}
 
             {location && !roadWarning && !checkingRoad && (
-              <p className="text-[11px] text-muted-foreground">
-                📍 {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
-              </p>
+              <div className="space-y-0.5">
+                <p className="text-[11px] font-medium text-foreground">
+                  📍 {roadName || 'Unnamed Road'}
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                </p>
+              </div>
             )}
           </div>
 

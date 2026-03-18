@@ -4,7 +4,7 @@ import L from 'leaflet';
 import { useIssues, useVerifyIssue, type Issue } from '@/hooks/useIssues';
 import { useAuthContext } from '@/components/AuthProvider';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, AlertTriangle, Calendar, User, Activity } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Calendar, User, Activity, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import ReportDialog from '@/components/ReportDialog';
 import NearbyIssuesAlert from '@/components/NearbyIssuesAlert';
@@ -93,9 +93,33 @@ function MapLegend() {
   );
 }
 
+const roadNameCache = new Map<string, string>();
+
+async function fetchRoadName(lat: number, lng: number): Promise<string> {
+  const key = `${lat.toFixed(5)}:${lng.toFixed(5)}`;
+  if (roadNameCache.has(key)) return roadNameCache.get(key)!;
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18`,
+      { headers: { 'User-Agent': 'StreetGuardNG/1.0' } }
+    );
+    const data = await res.json();
+    const road = data?.address?.road || data?.address?.highway || data?.address?.pedestrian || 'Unnamed Road';
+    roadNameCache.set(key, road);
+    return road;
+  } catch {
+    return 'Unnamed Road';
+  }
+}
+
 function IssuePopup({ issue }: { issue: Issue }) {
   const { user } = useAuthContext();
   const verify = useVerifyIssue();
+  const [roadName, setRoadName] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchRoadName(issue.latitude, issue.longitude).then(setRoadName);
+  }, [issue.latitude, issue.longitude]);
 
   const handleVerify = () => {
     if (!user) {
@@ -122,6 +146,10 @@ function IssuePopup({ issue }: { issue: Issue }) {
         <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${severityBg[issue.severity]}`}>
           {severityLabel[issue.severity]}
         </span>
+      </div>
+      <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+        <MapPin className="h-3 w-3 shrink-0" />
+        <span>{roadName ?? 'Loading…'}</span>
       </div>
       {issue.description && <p className="text-xs text-muted-foreground leading-relaxed">{issue.description}</p>}
       {issue.image_url && (
