@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, MapPin, Loader2, AlertTriangle, FileText, Camera, Send, Navigation, AlertCircle } from 'lucide-react';
+import { Plus, Loader2, AlertTriangle, FileText, Camera, Send, Navigation, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,6 +9,7 @@ import { useCreateIssue } from '@/hooks/useIssues';
 import { useAuthContext } from '@/components/AuthProvider';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import ReportMiniMap from '@/components/ReportMiniMap';
 
 const ISSUE_TYPES = ['Pothole', 'Flooded Road', 'Broken Streetlight', 'Accident', 'Road Block'];
 const SEVERITIES = [
@@ -25,11 +26,10 @@ async function checkNearRoad(lat: number, lng: number): Promise<{ nearRoad: bool
     );
     const data = await res.json();
     const road = data?.address?.road || data?.address?.highway || data?.address?.pedestrian;
-    // Nominatim at zoom 18 returns nearby road info; if a road name exists, user is near one
     if (road) return { nearRoad: true, roadName: road };
     return { nearRoad: false };
   } catch {
-    return { nearRoad: true }; // fail open
+    return { nearRoad: true };
   }
 }
 
@@ -51,7 +51,6 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
   const [roadWarning, setRoadWarning] = useState<string | null>(null);
   const [checkingRoad, setCheckingRoad] = useState(false);
 
-  // Sync external location from draggable marker
   useEffect(() => {
     if (externalLocation && open) {
       setLocation(externalLocation);
@@ -92,12 +91,15 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
     );
   }, [detectAndCheckLocation, onLocationChange]);
 
-  // Auto-detect location when dialog opens
   useEffect(() => {
     if (open && !location) {
       getLocation();
     }
   }, [open]); // intentionally minimal deps
+
+  const handleMarkerDrag = useCallback((lat: number, lng: number) => {
+    detectAndCheckLocation(lat, lng);
+  }, [detectAndCheckLocation]);
 
   const handleSubmit = () => {
     if (!type) { toast.error('Select an issue type'); return; }
@@ -146,7 +148,7 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
           <Plus className="h-6 w-6" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[420px] rounded-2xl border-border/50 bg-card/95 backdrop-blur-xl overflow-visible">
+      <DialogContent className="sm:max-w-[420px] max-h-[90vh] overflow-y-auto rounded-2xl border-border/50 bg-card/95 backdrop-blur-xl overflow-x-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-base">
             <AlertTriangle className="h-4 w-4 text-primary" />
@@ -206,37 +208,41 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Briefly describe the issue..."
               maxLength={500}
-              rows={3}
+              rows={2}
               className="resize-none text-sm"
             />
           </div>
 
-          {/* Photo placeholder */}
+          {/* Mini Map */}
           <div className="space-y-1.5">
             <Label className="flex items-center gap-1.5 text-xs font-medium">
-              <Camera className="h-3 w-3 text-muted-foreground" />
-              Photo (optional)
+              <Navigation className="h-3 w-3 text-muted-foreground" />
+              Location
             </Label>
-            <div className="flex h-16 items-center justify-center rounded-lg border border-dashed border-border text-xs text-muted-foreground">
-              Photo upload coming soon
-            </div>
-          </div>
-
-          {/* Location */}
-          <div className="space-y-2">
-            <Button
-              variant="outline"
-              className="w-full h-9 text-sm"
-              onClick={getLocation}
-              disabled={locating}
-            >
-              {locating ? (
-                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Navigation className="mr-2 h-3.5 w-3.5" />
+            <p className="text-[11px] text-muted-foreground">
+              Drag the marker to the exact road location if needed
+            </p>
+            <div className="h-[200px] w-full overflow-hidden rounded-lg border border-border">
+              {open && (
+                <ReportMiniMap
+                  location={location}
+                  locating={locating}
+                  onMarkerDrag={handleMarkerDrag}
+                />
               )}
-              {location ? `📍 ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : 'Capture Location'}
-            </Button>
+            </div>
+
+            {!location && (
+              <Button
+                variant="outline"
+                className="w-full h-8 text-xs"
+                onClick={getLocation}
+                disabled={locating}
+              >
+                {locating ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Navigation className="mr-2 h-3 w-3" />}
+                Capture Location
+              </Button>
+            )}
 
             {checkingRoad && (
               <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
@@ -253,8 +259,7 @@ export default function ReportDialog({ onLocationChange, externalLocation }: Rep
 
             {location && !roadWarning && !checkingRoad && (
               <p className="text-[11px] text-muted-foreground">
-                <MapPin className="mr-1 inline h-3 w-3" />
-                Drag the marker on the map to adjust location.
+                📍 {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
               </p>
             )}
           </div>
