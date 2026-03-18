@@ -4,7 +4,7 @@ import L from 'leaflet';
 import { useIssues, useVerifyIssue, type Issue } from '@/hooks/useIssues';
 import { useAuthContext } from '@/components/AuthProvider';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, AlertTriangle, Calendar, User, Activity } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Calendar, User, Activity, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import ReportDialog from '@/components/ReportDialog';
 import NearbyIssuesAlert from '@/components/NearbyIssuesAlert';
