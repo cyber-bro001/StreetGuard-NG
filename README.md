@@ -1,73 +1,154 @@
-# Welcome to your Lovable project
+# 🚧 StreetGuard NG
 
-## Project info
+StreetGuard NG is a smart, crowdsourced web application designed to help drivers and commuters in Nigeria identify and avoid dangerous road conditions in real time.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## 🌍 Problem
 
-There are several ways of editing your application.
+Road infrastructure issues such as potholes, flooding, and damaged roads are common across many parts of Nigeria. These issues:
 
-**Use Lovable**
+* Cause vehicle damage
+* Lead to accidents
+* Increase travel time and fuel consumption
+* Lack a centralized reporting system
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Most drivers only discover these problems **when it’s already too late**.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 💡 Solution
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+StreetGuard NG provides a platform where users can:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+* 📍 Report road issues with precise location
+* 🗺️ View reported issues on a live map
+* 🚨 Get nearby alerts about hazards without needing to explore the map
+* 🛠️ Contribute to a crowdsourced road monitoring system
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## ✨ Key Features
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 🚨 Nearby Issues Alert (Driver Mode)
 
-# Step 3: Install the necessary dependencies.
-npm i
+* Automatically detects user location
+* Displays road hazards within a 500m radius
+* Reduces the need to interact with the map while driving
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+---
 
-**Edit a file directly in GitHub**
+### 🗺️ Interactive Map
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+* Displays all reported issues as markers
+* Supports clustering for better visualization
+* Allows users to explore affected areas
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 📝 Smart Reporting System
 
-## What technologies are used for this project?
+* Users can report:
 
-This project is built with:
+  * Potholes
+  * Flooded roads
+  * Damaged infrastructure
+* Includes severity levels
+* Location is auto-detected and adjustable
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+### 📍 Accurate Location Selection
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+* GPS-based location detection
+* Draggable marker for precise placement
+* Reverse geocoding to display road names
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+### 👤 User System
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+* Authentication enabled
+* Users earn points for reporting issues
+* Encourages community participation
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
+
+## 🛠️ Tech Stack
+
+* Frontend: React + TypeScript
+* Styling: Tailwind CSS
+* Backend: Lovable Cloud (PostgreSQL, Auth, Storage)
+* Maps: Leaflet + OpenStreetMap
+* Geolocation: Browser Geolocation API
+* Reverse Geocoding: OpenStreetMap Nominatim
+
+---
+
+## 🚀 How It Works
+
+1. User opens the app
+2. Nearby road issues are displayed instantly
+3. User can view issues on the map
+4. User reports a new issue:
+
+   * Location is auto-detected
+   * Marker can be adjusted
+5. Report is saved and visible to others
+
+---
+
+## 🎯 Use Cases
+
+* Daily commuters avoiding bad roads
+* Ride-hailing drivers (Uber/Bolt)
+* Delivery riders
+* Local communities reporting infrastructure issues
+
+---
+
+## 📈 Future Improvements
+
+* Real-time notifications for nearby hazards
+* Route optimization based on road conditions
+* Government integration for road maintenance tracking
+* Mobile app version
+
+---
+
+## 🧠 Inspiration
+
+Inspired by real-world challenges faced by Nigerian road users and platforms like navigation apps, StreetGuard NG focuses specifically on **road condition awareness and reporting**.
+
+---
+
+## 📌 Status
+
+MVP (Minimum Viable Product) – Fully functional and demo-ready.
+
+---
+
+## 🤝 Contribution
+
+This project is currently an individual submission. Contributions and feedback are welcome after the competition.
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+## 🙌 Acknowledgements
+
+* OpenStreetMap for map data
+* Nominatim for geocoding services
+* Lovable for rapid app development
+
+---
+
+## 📬 Contact
+
+For feedback or collaboration:
+[Add your contact info or GitHub profile here]
